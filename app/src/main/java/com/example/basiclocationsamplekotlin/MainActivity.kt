@@ -15,7 +15,6 @@ import androidx.core.app.ActivityCompat
 import com.example.basiclocationsamplekotlin.databinding.MainBinding
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
-import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.Task
 import com.google.android.material.snackbar.Snackbar
 import java.util.*
@@ -86,35 +85,34 @@ class MainActivity : AppCompatActivity() {
                 ) != PackageManager.PERMISSION_GRANTED
             )
                 return
-            mFusedLocationClient.lastLocation
-                .addOnCompleteListener(this, object : OnCompleteListener<Location?> {
-                    override fun onComplete(task: Task<Location?>) {
-                        if (task.isSuccessful() && task.getResult() != null) {
-                            mLastLocation = task.getResult()
-                            mLatitudeText.text = String.format(
-                                Locale.ENGLISH, "%s: %f",
-                                mLatitudeLabel,
-                                mLastLocation!!.latitude
-                            )
-                            mLongitudeText.text = String.format(
-                                Locale.ENGLISH, "%s: %f",
-                                mLongitudeLabel,
-                                mLastLocation!!.longitude
-                            )
-                        } else {
-                            Log.w(TAG, "getLastLocation:exception", task.getException())
-                            showSnackbar(getString(R.string.no_location_detected))
-                        }
-                    }
-                })
-        }
+            mFusedLocationClient.lastLocation.addOnCompleteListener { task : Task<Location> ->
+                if (task.isSuccessful() && task.getResult() != null) {
+                    mLastLocation = task.getResult()
+                    mLatitudeText.text = String.format(
+                        Locale.ENGLISH, "%s: %f",
+                        mLatitudeLabel,
+                        mLastLocation?.latitude
+                    )
+                    mLongitudeText.text = String.format(
+                        Locale.ENGLISH, "%s: %f",
+                        mLongitudeLabel,
+                        mLastLocation?.longitude
+                    )
+                } else {
+                    Log.w(TAG, "getLastLocation:exception", task.getException())
+                    showSnackbar(getString(R.string.no_location_detected))
+                }
+            }
+         }
+
+
 
     /**
      * Shows a [Snackbar] using `text`.
      *
      * @param text The Snackbar text.
      */
-    private fun showSnackbar(text: String) {
+    fun showSnackbar(text: String) {
         val container = findViewById<View>(R.id.main_activity_container)
         if (container != null) {
             Snackbar.make(container, text, Snackbar.LENGTH_LONG).show()
@@ -128,7 +126,7 @@ class MainActivity : AppCompatActivity() {
      * @param actionStringId   The text of the action item.
      * @param listener         The listener associated with the Snackbar action.
      */
-    private fun showSnackbar(
+    fun showSnackbar(
         mainTextStringId: Int, actionStringId: Int,
         listener: View.OnClickListener
     ) {
@@ -143,7 +141,7 @@ class MainActivity : AppCompatActivity() {
     /**
      * Return the current state of the permissions needed.
      */
-    private fun checkPermissions(): Boolean {
+    fun checkPermissions(): Boolean {
         val permissionState = ActivityCompat.checkSelfPermission(
             this,
             Manifest.permission.ACCESS_COARSE_LOCATION
@@ -155,7 +153,7 @@ class MainActivity : AppCompatActivity() {
         return (permissionState == PackageManager.PERMISSION_GRANTED) && (backgroundPermissionState == PackageManager.PERMISSION_GRANTED)
     }
 
-    private fun startLocationPermissionRequest() {
+    fun startLocationPermissionRequest() {
         ActivityCompat.requestPermissions(
             this@MainActivity, arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION),
             REQUEST_PERMISSIONS_REQUEST_CODE
@@ -166,7 +164,7 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
-    private fun requestPermissions() {
+    fun requestPermissions() {
         val shouldProvideRationale = ActivityCompat.shouldShowRequestPermissionRationale(
             this,
             Manifest.permission.ACCESS_COARSE_LOCATION
