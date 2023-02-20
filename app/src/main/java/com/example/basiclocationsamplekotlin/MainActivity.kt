@@ -77,8 +77,8 @@ class MainActivity : AppCompatActivity() {
                 } else -> {
                 // No location access granted.
                 showSnackbar(
-                    com.google.android.gms.location.R.string.permission_denied_explanation,
-                    com.google.android.gms.location.R.string.settings
+                    R.string.permission_denied_explanation,
+                    R.string.settings
                 ) { // Build intent that displays the App settings screen.
                     val intent = Intent()
                     intent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
