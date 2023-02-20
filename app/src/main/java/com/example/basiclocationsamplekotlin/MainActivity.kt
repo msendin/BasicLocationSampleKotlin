@@ -45,6 +45,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var mLongitudeText: TextView
 
     private lateinit var binding: MainBinding
+    private var settings = false
 
 
     //private lateinit var locationPermissionLauncher: ActivityResultLauncher<String>
@@ -98,7 +99,7 @@ class MainActivity : AppCompatActivity() {
 
     public override fun onStart() {
         super.onStart()
-        if (!checkPermissions()) {
+        if (!checkPermissions() && !settings) {
             requestPermissions()
         } else {
             lastLocation
@@ -231,6 +232,7 @@ class MainActivity : AppCompatActivity() {
             ) { // Request permission
                 startLocationPermissionRequest()
             }
+            settings = true
         } else {
             Log.i(TAG, "Requesting permission")
             // Request permission. It's possible this can be auto answered if device policy
