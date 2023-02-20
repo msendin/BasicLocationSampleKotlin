@@ -10,6 +10,9 @@ import android.provider.Settings
 import android.util.Log
 import android.view.View
 import android.widget.TextView
+import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.example.basiclocationsamplekotlin.databinding.MainBinding
@@ -35,13 +38,16 @@ class MainActivity : AppCompatActivity() {
     /**
      * Represents a geographical location.
      */
-    protected var mLastLocation: Location? = null
+    
     private var mLatitudeLabel: String? = null
     private var mLongitudeLabel: String? = null
     private lateinit var mLatitudeText: TextView
     private lateinit var mLongitudeText: TextView
 
     private lateinit var binding: MainBinding
+
+
+    //private lateinit var locationPermissionLauncher: ActivityResultLauncher<String>
 
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,6 +60,40 @@ class MainActivity : AppCompatActivity() {
         mLongitudeText = binding.longitudeText
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+
+        /*
+        locationPermissionLauncher = registerForActivityResult(
+            ActivityResultContracts.RequestPermission()
+        ) { permission ->
+            when {
+                ActivityCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                ) == PackageManager.PERMISSION_GRANTED -> {
+                    // Only approximate location access granted.
+                    Log.i(TAG, "User agreed to make coarse required location settings changes, updates requested, starting location updates.")
+                    lastLocation
+                } else -> {
+                // No location access granted.
+                showSnackbar(
+                    com.google.android.gms.location.R.string.permission_denied_explanation,
+                    com.google.android.gms.location.R.string.settings
+                ) { // Build intent that displays the App settings screen.
+                    val intent = Intent()
+                    intent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+                    val uri = Uri.fromParts(
+                        "package",
+                        BuildConfig.APPLICATION_ID, null
+                    )
+                    intent.data = uri
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                    startActivity(intent)
+                }
+            }
+            }
+        }
+         */
+
     }
 
     public override fun onStart() {
@@ -76,18 +116,32 @@ class MainActivity : AppCompatActivity() {
      */
     private val lastLocation: Unit
         get() {
-           if (ActivityCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.ACCESS_BACKGROUND_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+            if (ActivityCompat.checkSelfPermission(
                     this,
                     Manifest.permission.ACCESS_COARSE_LOCATION
                 ) != PackageManager.PERMISSION_GRANTED
-            )
-                return
-            mFusedLocationClient.lastLocation.addOnCompleteListener { task : Task<Location> ->
+              ) return
+
+            mFusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                        // Got last known location. In some rare situations this can be null.
+                mLatitudeText.text = String.format(
+                    Locale.ENGLISH, "%s: %f",
+                    mLatitudeLabel,
+                    location?.latitude
+                )
+                mLongitudeText.text = String.format(
+                    Locale.ENGLISH, "%s: %f",
+                    mLongitudeLabel,
+                    location?.longitude)
+                    }
+                .addOnFailureListener {
+                        showSnackbar("Failed on getting current location")
+                }
+
+            /*
+            mFusedLocationClient.lastLocation.addOnCompleteListener { task: Task<Location> ->
                 if (task.isSuccessful() && task.getResult() != null) {
-                    mLastLocation = task.getResult()
+                    var mLastLocation = task.getResult()
                     mLatitudeText.text = String.format(
                         Locale.ENGLISH, "%s: %f",
                         mLatitudeLabel,
@@ -103,7 +157,11 @@ class MainActivity : AppCompatActivity() {
                     showSnackbar(getString(R.string.no_location_detected))
                 }
             }
-         }
+
+             */
+        }
+
+
 
 
 
@@ -142,26 +200,20 @@ class MainActivity : AppCompatActivity() {
      * Return the current state of the permissions needed.
      */
     fun checkPermissions(): Boolean {
-        val permissionState = ActivityCompat.checkSelfPermission(
+        val coarsePermissionState = ActivityCompat.checkSelfPermission(
             this,
             Manifest.permission.ACCESS_COARSE_LOCATION
         )
-        val backgroundPermissionState = ActivityCompat.checkSelfPermission(
-            this,
-            Manifest.permission.ACCESS_BACKGROUND_LOCATION
-        )
-        return (permissionState == PackageManager.PERMISSION_GRANTED) && (backgroundPermissionState == PackageManager.PERMISSION_GRANTED)
+        return (coarsePermissionState == PackageManager.PERMISSION_GRANTED)
     }
 
     fun startLocationPermissionRequest() {
+
         ActivityCompat.requestPermissions(
             this@MainActivity, arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION),
             REQUEST_PERMISSIONS_REQUEST_CODE
         )
-        ActivityCompat.requestPermissions(
-            this@MainActivity, arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION),
-            REQUEST_PERMISSIONS_REQUEST_CODE
-        )
+        //locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
     }
 
     fun requestPermissions() {
