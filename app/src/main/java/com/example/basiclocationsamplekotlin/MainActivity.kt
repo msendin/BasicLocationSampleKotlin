@@ -3,14 +3,12 @@ package com.example.basiclocationsamplekotlin
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.location.Location
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
 import android.view.View
 import android.widget.TextView
-import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -48,7 +46,7 @@ class MainActivity : AppCompatActivity() {
     private var settings = false
 
 
-    //private lateinit var locationPermissionLauncher: ActivityResultLauncher<String>
+    private lateinit var locationPermissionLauncher: ActivityResultLauncher<String>
 
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,7 +60,7 @@ class MainActivity : AppCompatActivity() {
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
-        /*
+
         locationPermissionLauncher = registerForActivityResult(
             ActivityResultContracts.RequestPermission()
         ) { permission ->
@@ -93,7 +91,7 @@ class MainActivity : AppCompatActivity() {
             }
             }
         }
-         */
+
 
     }
 
@@ -139,10 +137,12 @@ class MainActivity : AppCompatActivity() {
                         showSnackbar("Failed on getting current location")
                 }
 
-            /*
+
+
+/*
             mFusedLocationClient.lastLocation.addOnCompleteListener { task: Task<Location> ->
                 if (task.isSuccessful() && task.getResult() != null) {
-                    var mLastLocation = task.getResult()
+                    val mLastLocation = task.getResult()
                     mLatitudeText.text = String.format(
                         Locale.ENGLISH, "%s: %f",
                         mLatitudeLabel,
@@ -159,7 +159,9 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
-             */
+
+
+ */
         }
 
 
@@ -209,12 +211,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun startLocationPermissionRequest() {
-
+        /*
         ActivityCompat.requestPermissions(
             this@MainActivity, arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION),
             REQUEST_PERMISSIONS_REQUEST_CODE
         )
-        //locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+
+         */
+        locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
     }
 
     fun requestPermissions() {
@@ -244,7 +248,8 @@ class MainActivity : AppCompatActivity() {
 
     /**
      * Callback received when a permissions request has been completed.
-     */
+
+
     override fun onRequestPermissionsResult(
         requestCode: Int, permissions: Array<String>,
         grantResults: IntArray
@@ -287,6 +292,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+    */
 
     companion object {
         private val TAG = MainActivity::class.java.simpleName
