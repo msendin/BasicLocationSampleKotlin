@@ -11,5 +11,10 @@
     <string name="permission_denied_explanation">Permission was denied, but is needed for core
         functionality.</string>
     <string name="settings">Settings</string>
+    <string name="failed">Failed on getting current location</string>
+    <string name="user_agreed">User agreed to make coarse required location settings changes, updates requested, starting location updates.</string>
+    <string name="paquete">package</string>
+    <string name="requesting">Requesting permission</string>
+    <string name="displaying">Displaying permission rationale to provide additional context.</string>
 
 </resources>
